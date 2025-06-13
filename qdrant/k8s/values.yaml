@@ -1,0 +1,45 @@
+qdrant:
+  ingress:
+    enabled: true
+    ingressClassName: "traefik"
+    additionalLabels: {}
+    annotations:
+      cert-manager.io/cluster-issuer: lets-encrypt
+    hosts:
+      - host: qdrant.local.jarrett.page
+        paths:
+          - path: /
+            pathType: Prefix
+            servicePort: 6333
+    tls: 
+      - hosts:
+         - qdrant.local.jarrett.page
+        secretName: qdrant-tls
+
+  resources:
+    limits:
+      cpu: 2
+      memory: 2Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
+
+  updateVolumeFsOwnership: true
+
+  affinity: {}
+
+  persistence:
+    accessModes: ["ReadWriteOnce"]
+    size: 10Gi
+    storageClassName: longhorn
+
+  snapshotPersistence:
+    enabled: false
+    accessModes: ["ReadWriteOnce"]
+    size: 10Gi
+    annotations: {}
+    storageClassName: nfs-lilnasx
+
+  metrics:
+    serviceMonitor:
+      enabled: true
