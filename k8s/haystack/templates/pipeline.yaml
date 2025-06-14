@@ -11,7 +11,7 @@ data:
       - name: DocumentStore
         type: QdrantDocumentStore
         params:
-          url: "http://qdrant.local.jarrett.page:6333"
+          url: "http://qdrant.local.jarrett.page"
           index: "my_docs"
           embedding_dim: 384   # match your embedding model
 
@@ -24,7 +24,7 @@ data:
       - name: Generator
         type: PromptNode
         params:
-          model_name_or_path: "http://llama.local.jarrett.page:11434/v1/completions"
+          model_name_or_path: "http://llama.local.jarrett.page/v1/completions"
           api_key: "ollama"   # anything if not needed
           max_length: 512
           default_prompt_template: "default"
