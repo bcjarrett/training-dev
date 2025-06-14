@@ -6,33 +6,24 @@ metadata:
     {{- include "haystack.labels" . | nindent 4 }}
 data:
   pipe.yaml: |
-    version: '2.0'
-    components:
-      - name: DocumentStore
-        type: QdrantDocumentStore
-        params:
-          url: "http://qdrant.local.jarrett.page"
-          index: "my_docs"
-          embedding_dim: 384   # match your embedding model
-
+    name: query
+    nodes:
       - name: Retriever
         type: EmbeddingRetriever
         params:
-          document_store: DocumentStore
-          embedding_model: "sentence-transformers/all-MiniLM-L6-v2"   # or another
-
+          document_store:
+            type: QdrantDocumentStore
+            params:
+              url: "http://qdrant.local.jarrett.page"
+              index: "my_docs"
+              embedding_dim: 384
+          embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+        inputs: [Query]
       - name: Generator
         type: PromptNode
         params:
           model_name_or_path: "http://llama.local.jarrett.page/v1/completions"
-          api_key: "ollama"   # anything if not needed
+          api_key: "ollama"
           max_length: 512
           default_prompt_template: "default"
-
-    pipelines:
-      - name: query
-        nodes:
-          - name: Retriever
-            inputs: [Query]
-          - name: Generator
-            inputs: [Retriever]
+        inputs: [Retriever]

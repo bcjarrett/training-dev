@@ -55,8 +55,14 @@ resources:
     cpu: 1
     memory: 1Gi
 
-livenessProbe: {}
-readinessProbe: {}
+livenessProbe:
+  httpGet:
+    path: /status
+    port: http
+readinessProbe:
+  httpGet:
+    path: /status
+    port: http
 
 # Additional volumes on the output Deployment definition.
 volumes: []
