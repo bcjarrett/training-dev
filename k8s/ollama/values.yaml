@@ -69,15 +69,15 @@ ollama:
           - ollama.local.jarrett.page
         secretName: ollama-tls
 
-resources:
-  limits:
-    cpu: 8
-    memory: 16Gi
-    nvidia.com/gpu: 1
-  requests:
-    cpu: 2
-    memory: 2Gi
-    nvidia.com/gpu: 1
+  resources:
+    limits:
+      cpu: 8
+      memory: 16Gi
+      nvidia.com/gpu: 1
+    requests:
+      cpu: 2
+      memory: 2Gi
+      nvidia.com/gpu: 1
   persistentVolume:
     enabled: true
     accessModes:
