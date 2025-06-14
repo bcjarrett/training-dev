@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "haystack.fullname" . }}-pipeline
+  labels:
+    {{- include "haystack.labels" . | nindent 4 }}
+data:
+  pipe.yaml: |
+    version: '2.0'
+    components:
+      - name: DocumentStore
+        type: QdrantDocumentStore
+        params:
+          url: "http://qdrant.local.jarrett.page:6333"
+          index: "my_docs"
+          embedding_dim: 384   # match your embedding model
+
+      - name: Retriever
+        type: EmbeddingRetriever
+        params:
+          document_store: DocumentStore
+          embedding_model: "sentence-transformers/all-MiniLM-L6-v2"   # or another
+
+      - name: Generator
+        type: PromptNode
+        params:
+          model_name_or_path: "http://llama.local.jarrett.page:11434/v1/completions"
+          api_key: "ollama"   # anything if not needed
+          max_length: 512
+          default_prompt_template: "default"
+
+    pipelines:
+      - name: query
+        nodes:
+          - name: Retriever
+            inputs: [Query]
+          - name: Generator
+            inputs: [Retriever]
