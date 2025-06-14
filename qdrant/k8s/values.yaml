@@ -26,7 +26,17 @@ qdrant:
 
   updateVolumeFsOwnership: true
 
-  affinity: {}
+  affinity:
+    nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          preference:
+            matchExpressions:
+            - key: hardware.jarrett.page/model
+              operator: In
+              values:
+              - supermicro
+
 
   persistence:
     accessModes: ["ReadWriteOnce"]
