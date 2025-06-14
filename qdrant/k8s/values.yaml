@@ -24,7 +24,7 @@ qdrant:
       cpu: 1
       memory: 1Gi
 
-  updateVolumeFsOwnership: true
+  updateVolumeFsOwnership: false
 
   affinity:
     nodeAffinity:
