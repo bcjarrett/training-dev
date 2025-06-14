@@ -1,0 +1,239 @@
+open-webui:
+  nameOverride: ""
+  namespaceOverride: ""
+  ollama:
+    enabled: true
+    fullnameOverride: "open-webui-ollama"
+    gpu:
+      enabled: true
+      type: 'nvidia'
+      number: 1
+      nvidiaResource: "nvidia.com/gpu"
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: nvidia.com/gpu.product
+                  operator: In
+                  values:
+                    - NVIDIA-RTX-A4000-SHARED
+    ingress:
+      enabled: true
+      ingressClassName: "traefik"
+      additionalLabels: {}
+      annotations:
+        cert-manager.io/cluster-issuer: lets-encrypt
+      hosts:
+        - host: ollama.local.jarrett.page
+          paths:
+            - path: /
+              pathType: Prefix
+              servicePort: 6333
+      tls:
+        - hosts:
+            - ollama.local.jarrett.page
+          secretName: ollama-tls
+    resources:
+      limits:
+        cpu: 8
+        memory: 16Gi
+        nvidia.com/gpu: 1
+      requests:
+        cpu: 2
+        memory: 2Gi
+        nvidia.com/gpu: 1
+    persistentVolume:
+      enabled: true
+      accessModes:
+        - ReadWriteOnce
+      size: 30Gi
+      storageClass: "nfs-lilnasx"
+    models:
+      # -- List of models to pull at container startup
+      # The more you add, the longer the container will take to start if models are not present
+      # pull:
+      #  - llama2
+      #  - mistral
+      pull: []
+
+      # -- List of models to load in memory at container startup
+      # run:
+      #  - llama2
+      #  - mistral
+      run: []
+
+      # -- List of models to create at container startup, there are two options
+      # 1. Create a raw model
+      # 2. Load a model from configMaps, configMaps must be created before and are loaded as volume in "/models" directory.
+      # create:
+      #  - name: llama3.1-ctx32768
+      #    configMapRef: my-configmap
+      #    configMapKeyRef: configmap-key
+      #  - name: llama3.1-ctx32768
+      #    template: |
+      #      FROM llama3.1
+      #      PARAMETER num_ctx 32768
+      create: []
+
+  pipelines:
+    enabled: false
+
+  tika:
+    enabled: false
+
+  websocket:
+    enabled: false
+
+  redis-cluster:
+    enabled: false
+
+  replicaCount: 1
+  strategy:
+    type: Recreate
+  image:
+    repository: ghcr.io/open-webui/open-webui
+    tag: ""
+    pullPolicy: "IfNotPresent"
+
+  livenessProbe: {}
+  # livenessProbe:
+  #   httpGet:
+  #     path: /health
+  #     port: http
+  #   failureThreshold: 1
+  #   periodSeconds: 10
+
+  readinessProbe: {}
+  # readinessProbe:
+  #   httpGet:
+  #     path: /health/db
+  #     port: http
+  #   failureThreshold: 1
+  #   periodSeconds: 10
+
+  startupProbe: {}
+  # startupProbe:
+  #   httpGet:
+  #     path: /health
+  #     port: http
+  #   initialDelaySeconds: 30
+  #   periodSeconds: 5
+  #   failureThreshold: 20
+
+  resources:
+    limits:
+      cpu: 2
+      memory: 4Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
+
+  ingress:
+    enabled: true
+    class: "traefik"
+    annotations:
+      cert-manager.io/cluster-issuer: lets-encrypt
+    host: "chat.local.jarrett.page"
+    additionalHosts: []
+    tls:
+      - hosts:
+          - chat.local.jarrett.page
+        secretName: openwebui-tls
+
+  persistence:
+    enabled: true
+    size: 2Gi
+    accessModes:
+      - ReadWriteOnce
+    storageClass: "longhorn"
+    provider: local
+    s3:
+      # -- Sets the access key ID for S3 storage
+      # @section -- Amazon S3 Storage configuration
+      accessKey: ""
+      # -- Sets the secret access key for S3 storage (ignored if secretKeyExistingSecret is set)
+      # @section -- Amazon S3 Storage configuration
+      secretKey: ""
+      # -- Set the secret access key for S3 storage from existing k8s secret
+      # @section -- Amazon S3 Storage configuration
+      secretKeyExistingSecret: ""
+      # -- Set the secret access key for S3 storage from existing k8s secret key
+      # @section -- Amazon S3 Storage configuration
+      secretKeyExistingSecretKey: ""
+      # -- Sets the endpoint url for S3 storage
+      # @section -- Amazon S3 Storage configuration
+      endpointUrl: ""
+      # -- Sets the region name for S3 storage
+      # @section -- Amazon S3 Storage configuration
+      region: ""
+      # -- Sets the bucket name for S3 storage
+      # @section -- Amazon S3 Storage configuration
+      bucket: ""
+      # -- Sets the key prefix for a S3 object
+      # @section -- Amazon S3 Storage configuration
+      keyPrefix: ""
+    gcs:
+      # -- Contents of Google Application Credentials JSON file (ignored if appCredentialsJsonExistingSecret is set). Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Google Metadata server if run on a Google Compute Engine. File can be generated for a service account following this guide: https://developers.google.com/workspace/guides/create-credentials#service-account
+      # @section -- Google Cloud Storage configuration
+      appCredentialsJson: ""
+      # -- Set the Google Application Credentials JSON file for Google Cloud Storage from existing secret
+      # @section -- Google Cloud Storage configuration
+      appCredentialsJsonExistingSecret: ""
+      # -- Set the Google Application Credentials JSON file for Google Cloud Storage from existing secret key
+      # @section -- Google Cloud Storage configuration
+      appCredentialsJsonExistingSecretKey: ""
+      # -- Sets the bucket name for Google Cloud Storage. Bucket must already exist
+      # @section -- Google Cloud Storage configuration
+      bucket: ""
+    azure:
+      # -- Sets the endpoint URL for Azure Storage
+      # @section -- Azure Storage configuration
+      endpointUrl: ""
+      # -- Sets the container name for Azure Storage
+      # @section -- Azure Storage configuration
+      container: ""
+      # -- Set the access key for Azure Storage (ignored if keyExistingSecret is set). Optional - if not provided, credentials will be taken from the environment. User credentials if run locally and Managed Identity if run in Azure services
+      # @section -- Azure Storage configuration
+      key: ""
+      # -- Set the access key for Azure Storage from existing secret
+      # @section -- Azure Storage configuration
+      keyExistingSecret: ""
+      # -- Set the access key for Azure Storage from existing secret key
+      # @section -- Azure Storage configuration
+      keyExistingSecretKey: ""
+
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          preference:
+            matchExpressions:
+              - key: hardware.jarrett.page/model
+                operator: In
+                values:
+                  - supermicro
+
+  enableOpenaiApi: false
+  openaiBaseApiUrl: "https://api.openai.com/v1"
+  openaiBaseApiUrls: []
+
+  extraEnvVars: {}
+
+  # https://docs.openwebui.com/getting-started/env-configuration/
+  commonEnvVars: []
+    # - name: RAG_EMBEDDING_ENGINE
+    #   value: "openai"
+
+  sso:
+    enabled: false
+
+  # -- Configure database URL, needed to work with Postgres (example: `postgresql://<user>:<password>@<service>:<port>/<database>`), leave empty to use the default sqlite database
+  databaseUrl: ""
+
+  postgresql:
+    enabled: false
+
+  # Configure Application logging levels (see. https://docs.openwebui.com/getting-started/advanced-topics/logging#-logging-levels-explained)
+  logging:
+    level: "info"
