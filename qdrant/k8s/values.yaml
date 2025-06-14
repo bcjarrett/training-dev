@@ -34,7 +34,7 @@ qdrant:
     storageClassName: longhorn
 
   snapshotPersistence:
-    enabled: false
+    enabled: true
     accessModes: ["ReadWriteOnce"]
     size: 10Gi
     annotations: {}
