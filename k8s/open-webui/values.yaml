@@ -18,7 +18,7 @@ open-webui:
                 - key: nvidia.com/gpu.product
                   operator: In
                   values:
-                    - NVIDIA-RTX-A4000-SHARED
+                    - NVIDIA-RTX-A6000-SHARED
     ingress:
       enabled: true
       ingressClassName: "traefik"
